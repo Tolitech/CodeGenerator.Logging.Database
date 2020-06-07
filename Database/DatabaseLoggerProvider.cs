@@ -57,13 +57,14 @@ namespace Tolitech.CodeGenerator.Logging.Database
 
             try
             {
-                string sql  = "insert into [cg].[logging] " +
-                    "(time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, methodName, sql, sqlParam, stateText, stateProperties, scopeText, scopeProperties) " +
+                string sql  = "insert into [cg].[logs] " +
+                    "(loggingId, time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, methodName, sql, parameters, stateText, stateProperties, scopeText, scopeProperties) " +
                     "values " +
-                    "(@time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @methodName, @sql, @sqlParam, @stateText, @stateProperties, @scopeText, @scopeProperties)";
+                    "(@loggingId, @time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @methodName, @sql, @parameters, @stateText, @stateProperties, @scopeText, @scopeProperties)";
 
                 object param = new
                 {
+                    LoggingId = Guid.NewGuid(),
                     Time = info.TimeStampUtc.ToLocalTime(),
                     info.UserName,
                     info.HostName,
@@ -81,19 +82,22 @@ namespace Tolitech.CodeGenerator.Logging.Database
                     info.RequestPath,
                     info.MethodName,
                     info.Sql, 
-                    info.SqlParam,
+                    info.Parameters,
                     info.StateText,
                     StateProperties = stateProperties,
-                    ScopeText = scopeText,
+                    ScopeText = string.IsNullOrEmpty(scopeText) ? null : scopeText,
                     ScopeProperties = scopeProperties
                 };
 
-                using (var conn = GetNewConnection())
+                if (GetNewConnection != null)
                 {
-                    await conn.OpenAsync();
-                    await conn.ExecuteAsync(sql, param);
-                    await conn.CloseAsync();
-                    await conn.DisposeAsync();
+                    using (var conn = GetNewConnection())
+                    {
+                        await conn.OpenAsync();
+                        await conn.ExecuteAsync(sql, param);
+                        await conn.CloseAsync();
+                        await conn.DisposeAsync();
+                    }
                 }
             }
             catch(Exception ex)
