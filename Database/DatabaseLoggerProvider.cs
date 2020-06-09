@@ -58,13 +58,13 @@ namespace Tolitech.CodeGenerator.Logging.Database
             try
             {
                 string sql  = "insert into [cg].[logs] " +
-                    "(loggingId, time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, methodName, sql, parameters, stateText, stateProperties, scopeText, scopeProperties) " +
+                    "(logId, time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, methodName, sql, parameters, stateText, stateProperties, scopeText, scopeProperties) " +
                     "values " +
-                    "(@loggingId, @time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @methodName, @sql, @parameters, @stateText, @stateProperties, @scopeText, @scopeProperties)";
+                    "(@logId, @time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @methodName, @sql, @parameters, @stateText, @stateProperties, @scopeText, @scopeProperties)";
 
                 object param = new
                 {
-                    LoggingId = Guid.NewGuid(),
+                    LogId = Guid.NewGuid(),
                     Time = info.TimeStampUtc.ToLocalTime(),
                     info.UserName,
                     info.HostName,
