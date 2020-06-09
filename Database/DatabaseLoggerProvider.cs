@@ -58,9 +58,9 @@ namespace Tolitech.CodeGenerator.Logging.Database
             try
             {
                 string sql  = "insert into [cg].[logs] " +
-                    "(logId, time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, methodName, sql, parameters, stateText, stateProperties, scopeText, scopeProperties) " +
+                    "(logId, time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, filePath, memberName, lineNumber, sql, parameters, stateText, stateProperties, scopeText, scopeProperties) " +
                     "values " +
-                    "(@logId, @time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @methodName, @sql, @parameters, @stateText, @stateProperties, @scopeText, @scopeProperties)";
+                    "(@logId, @time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @filePath @memberName, @lineNumber, @sql, @parameters, @stateText, @stateProperties, @scopeText, @scopeProperties)";
 
                 object param = new
                 {
@@ -80,7 +80,9 @@ namespace Tolitech.CodeGenerator.Logging.Database
                     info.ActionName,
                     info.RequestId,
                     info.RequestPath,
-                    info.MethodName,
+                    info.FilePath,
+                    info.MemberName,
+                    info.LineNumber,
                     info.Sql, 
                     info.Parameters,
                     info.StateText,
