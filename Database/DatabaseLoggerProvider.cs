@@ -12,6 +12,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
     {
         public delegate DbConnection GetConnectionDelegate();
         public static GetConnectionDelegate GetNewConnection = null;
+        public static string TableName = "[Cg].[Logs]";
 
         async Task WriteLogLine(LogEntry info)
         {
@@ -57,10 +58,10 @@ namespace Tolitech.CodeGenerator.Logging.Database
 
             try
             {
-                string sql  = "insert into [cg].[logs] " +
-                    "(logId, time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, filePath, memberName, lineNumber, sql, parameters, stateText, stateProperties, scopeText, scopeProperties) " +
+                string sql  = "insert into " + TableName + " " +
+                    "(logId, time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, filePath, lineNumber, sql, parameters, stateText, stateProperties, scopeText, scopeProperties) " +
                     "values " +
-                    "(@logId, @time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @filePath @memberName, @lineNumber, @sql, @parameters, @stateText, @stateProperties, @scopeText, @scopeProperties)";
+                    "(@logId, @time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @filePath, @lineNumber, @sql, @parameters, @stateText, @stateProperties, @scopeText, @scopeProperties)";
 
                 object param = new
                 {
@@ -81,7 +82,6 @@ namespace Tolitech.CodeGenerator.Logging.Database
                     info.RequestId,
                     info.RequestPath,
                     info.FilePath,
-                    info.MemberName,
                     info.LineNumber,
                     info.Sql, 
                     info.Parameters,
