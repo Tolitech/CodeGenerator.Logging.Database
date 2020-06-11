@@ -57,12 +57,15 @@ namespace Tolitech.CodeGenerator.Logging.Database
                 }
             }
 
-            for (int index = 0; index < info.FilePath.Count; index++)
+            if (info.FilePath != null)
             {
-                if (!string.IsNullOrEmpty(filePath))
-                    filePath += "\n";
+                for (int index = 0; index < info.FilePath.Count; index++)
+                {
+                    if (!string.IsNullOrEmpty(filePath))
+                        filePath += "\n";
 
-                filePath += info.FilePath[index] + " (" + info.LineNumber[index] + ")";
+                    filePath += info.FilePath[index] + " (" + info.LineNumber[index] + ")";
+                }
             }
 
             try
