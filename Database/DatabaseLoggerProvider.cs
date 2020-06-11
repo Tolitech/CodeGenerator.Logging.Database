@@ -62,7 +62,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
                 if (!string.IsNullOrEmpty(filePath))
                     filePath += "\n";
 
-                filePath += info.FilePath[index] + "(" + info.LineNumber[index] + ")";
+                filePath += info.FilePath[index] + " (" + info.LineNumber[index] + ")";
             }
 
             try
