@@ -16,10 +16,10 @@ namespace Tolitech.CodeGenerator.Logging.Database
 
         async Task WriteLogLine(LogEntry info)
         {
-            string scopeText = "";
-            string scopeProperties = "";
-            string stateProperties = "";
-            string filePath = "";
+            string scopeText = null;
+            string scopeProperties = null;
+            string stateProperties = null;
+            string filePath = null;
 
             if (info.Scopes != null && info.Scopes.Count > 0)
             {
