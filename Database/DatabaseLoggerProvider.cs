@@ -106,10 +106,20 @@ namespace Tolitech.CodeGenerator.Logging.Database
                 {
                     using (var conn = GetNewConnection())
                     {
-                        await conn.OpenAsync();
-                        await conn.ExecuteAsync(sql, param);
-                        await conn.CloseAsync();
-                        await conn.DisposeAsync();
+                        try
+                        {
+                            await conn.OpenAsync();
+                            await conn.ExecuteAsync(sql, param);
+                            await conn.CloseAsync();
+                        }
+                        catch(Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+                        finally
+                        {
+                            await conn.DisposeAsync();
+                        }
                     }
                 }
             }
