@@ -12,7 +12,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
     {
         public delegate DbConnection GetConnectionDelegate();
         public static GetConnectionDelegate GetNewConnection = null;
-        public static string TableName = "[Cg].[Logs]";
+        public static string TableName = "[Cg].[Log]";
 
         async Task WriteLogLine(LogEntry info)
         {
