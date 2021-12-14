@@ -1,25 +1,25 @@
 ﻿using System;
 using System.Data.Common;
-using System.Threading.Tasks;
 using Dapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace Tolitech.CodeGenerator.Logging.Database
 {
-    [ProviderAlias("Database")]
-    public class DatabaseLoggerProvider : LoggerProvider
+    public abstract class DatabaseLoggerProvider : LoggerProvider
     {
-        public delegate DbConnection GetConnectionDelegate();
-        public static GetConnectionDelegate GetNewConnection = null;
-        public static string TableName = "[Cg].[Log]";
+        protected DbConnection? _connection;
+
+        protected abstract DbConnection GetNewConnection { get; }
+
+        protected abstract string Sql { get; }
 
         async Task WriteLogLine(LogEntry info)
         {
-            string scopeText = null;
-            string scopeProperties = null;
-            string stateProperties = null;
-            string filePath = null;
+            string? scopeText = null;
+            string? scopeProperties = null;
+            string? stateProperties = null;
+            string? filePath = null;
 
             if (info.Scopes != null && info.Scopes.Count > 0)
             {
@@ -48,7 +48,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
 
             if (info.StateProperties != null && info.StateProperties.Count > 0)
             {
-                foreach(var properties in info.StateProperties)
+                foreach (var properties in info.StateProperties)
                 {
                     if (!string.IsNullOrEmpty(stateProperties))
                         stateProperties += " | ";
@@ -64,23 +64,20 @@ namespace Tolitech.CodeGenerator.Logging.Database
                     if (!string.IsNullOrEmpty(filePath))
                         filePath += "\n";
 
-                    filePath += info.FilePath[index] + " (" + info.LineNumber[index] + ")";
+                    filePath += info.FilePath[index] + " (" + info.LineNumber?[index] + ")";
                 }
             }
 
             try
             {
-                string sql  = "insert into " + TableName + " " +
-                    "(logId, time, userName, hostName, category, level, text, exception, eventId, activityId, userId, loginName, actionId, actionName, requestId, requestPath, filePath, sql, parameters, stateText, stateProperties, scopeText, scopeProperties) " +
-                    "values " +
-                    "(@logId, @time, @userName, @hostName, @category, @level, @text, @exception, @eventId, @activityId, @userId, @loginName, @actionId, @actionName, @requestId, @requestPath, @filePath, @sql, @parameters, @stateText, @stateProperties, @scopeText, @scopeProperties)";
+                string sql = Sql;
 
                 object param = new
                 {
                     LogId = Guid.NewGuid(),
                     Time = info.TimeStampUtc.ToLocalTime(),
                     info.UserName,
-                    info.HostName,
+                    LogEntry.HostName,
                     info.Category,
                     Level = info.Level.ToString(),
                     info.Text,
@@ -94,7 +91,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
                     info.RequestId,
                     info.RequestPath,
                     filePath,
-                    info.Sql, 
+                    info.Sql,
                     info.Parameters,
                     info.StateText,
                     StateProperties = stateProperties,
@@ -102,9 +99,9 @@ namespace Tolitech.CodeGenerator.Logging.Database
                     ScopeProperties = scopeProperties
                 };
 
-                if (GetNewConnection != null)
+                if (!string.IsNullOrEmpty(Settings.ConnectionString))
                 {
-                    using (var conn = GetNewConnection())
+                    using (var conn = GetNewConnection)
                     {
                         try
                         {
@@ -112,7 +109,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
                             await conn.ExecuteAsync(sql, param);
                             await conn.CloseAsync();
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
                             Console.WriteLine(ex.Message);
                         }
@@ -123,7 +120,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -146,9 +143,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
 
         public override bool IsEnabled(LogLevel logLevel)
         {
-            bool Result = logLevel != LogLevel.None && this.Settings.LogLevel != LogLevel.None && Convert.ToInt32(logLevel) >= Convert.ToInt32(this.Settings.LogLevel);
-
-            return Result;
+            return logLevel != LogLevel.None;
         }
 
         public override void WriteLog(LogEntry Info)
@@ -156,6 +151,6 @@ namespace Tolitech.CodeGenerator.Logging.Database
             Task.Run(() => WriteLogLine(Info));
         }
 
-        internal DatabaseLoggerOptions Settings { get; private set; }
+        protected DatabaseLoggerOptions Settings { get; private set; }
     }
 }

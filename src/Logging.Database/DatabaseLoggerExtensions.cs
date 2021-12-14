@@ -12,10 +12,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
         static public ILoggingBuilder AddDatabaseLogger(this ILoggingBuilder builder)
         {
             builder.AddConfiguration();
-
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<ILoggerProvider, DatabaseLoggerProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IConfigureOptions<DatabaseLoggerOptions>, DatabaseLoggerOptionsSetup>());
-            builder.Services.TryAddEnumerable(ServiceDescriptor.Singleton<IOptionsChangeTokenSource<DatabaseLoggerOptions>, LoggerProviderOptionsChangeTokenSource<DatabaseLoggerOptions, DatabaseLoggerProvider>>());
             return builder;
         }
 
