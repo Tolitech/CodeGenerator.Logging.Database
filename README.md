@@ -17,24 +17,24 @@ public class SqlServerDatabaseLoggerProvider : DatabaseLoggerProvider
     }
 
     public SqlServerDatabaseLoggerProvider(DatabaseLoggerOptions Settings) : base(Settings)
-	{
+    {
 
-	}
+    }
 
-	protected override DbConnection GetNewConnection
-	{
-		get
-		{
-			return new SqlConnection(Settings.ConnectionString);
-		}
-	}
+    protected override DbConnection GetNewConnection
+    {
+        get
+        {
+            return new SqlConnection(Settings.ConnectionString);
+        }
+    }
 
-	protected override string Sql
-	{
-		get
-		{
-			return "insert into [Cg].[Log] (logId, time, hostName, text) values (@logId, @time, @hostName, @text)";
-		}
-	}
+    protected override string Sql
+    {
+        get
+        {
+            return "insert into [Cg].[Log] (logId, time, hostName, text) values (@logId, @time, @hostName, @text)";
+        }
+    }
 }
 ```
