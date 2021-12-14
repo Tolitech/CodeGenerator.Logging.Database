@@ -6,5 +6,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
     public class DatabaseLoggerOptions
     {
         public LogLevel LogLevel { get; set; } = LogLevel.Information;
+
+        public string? ConnectionString { get; set; }
     }
 }
