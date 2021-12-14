@@ -81,7 +81,7 @@ namespace Tolitech.CodeGenerator.Logging.Database
                     info.Category,
                     Level = info.Level.ToString(),
                     info.Text,
-                    Exception = info.Exception == null ? null : info.Exception.ToString(),
+                    Exception = info.Exception?.ToString(),
                     EventId = info.EventId.ToString(),
                     info.ActivityId,
                     info.UserId,
@@ -101,22 +101,21 @@ namespace Tolitech.CodeGenerator.Logging.Database
 
                 if (!string.IsNullOrEmpty(Settings.ConnectionString))
                 {
-                    using (var conn = GetNewConnection)
+                    using var conn = GetNewConnection;
+
+                    try
                     {
-                        try
-                        {
-                            await conn.OpenAsync();
-                            await conn.ExecuteAsync(sql, param);
-                            await conn.CloseAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine(ex.Message);
-                        }
-                        finally
-                        {
-                            await conn.DisposeAsync();
-                        }
+                        await conn.OpenAsync();
+                        await conn.ExecuteAsync(sql, param);
+                        await conn.CloseAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    finally
+                    {
+                        await conn.DisposeAsync();
                     }
                 }
             }
@@ -131,14 +130,14 @@ namespace Tolitech.CodeGenerator.Logging.Database
             base.Dispose(disposing);
         }
 
-        public DatabaseLoggerProvider(IOptionsMonitor<DatabaseLoggerOptions> Settings) : this(Settings.CurrentValue)
+        public DatabaseLoggerProvider(IOptionsMonitor<DatabaseLoggerOptions> settings) : this(settings.CurrentValue)
         {
-            SettingsChangeToken = Settings.OnChange(settings => { this.Settings = settings; });
+            SettingsChangeToken = settings.OnChange(settings => { this.Settings = settings; }); 
         }
 
-        public DatabaseLoggerProvider(DatabaseLoggerOptions Settings)
+        public DatabaseLoggerProvider(DatabaseLoggerOptions settings)
         {
-            this.Settings = Settings;
+            this.Settings = settings;
         }
 
         public override bool IsEnabled(LogLevel logLevel)
@@ -146,9 +145,9 @@ namespace Tolitech.CodeGenerator.Logging.Database
             return logLevel != LogLevel.None;
         }
 
-        public override void WriteLog(LogEntry Info)
+        public override void WriteLog(LogEntry info)
         {
-            Task.Run(() => WriteLogLine(Info));
+            Task.Run(() => WriteLogLine(info));
         }
 
         protected DatabaseLoggerOptions Settings { get; private set; }
