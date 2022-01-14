@@ -1,4 +1,4 @@
-# Logging.Database
+# Tolitech.CodeGenerator.Logging.Database
 Logging database library used in projects created by the Code Generator tool.
 
 This project contains abstract classes for implementing and customizing logging database providers. 
